@@ -4,7 +4,9 @@ This application can be used to show the functionality of [Actuator](https://git
 
 You can deploy it on Openshift with this command:
 
-    oc process -f imagestream-template.yml | oc create -f -
-    oc new-app centos/nginx-18-centos7~https://github.com/ninech/actuator-demo.git
+    # first import the image stream. this is only done once.
+    oc process -f https://raw.githubusercontent.com/ninech/actuator-demo/master/imagestream-template.yml | oc create -f -
+    # then install the rest of the app. this can be done once per branch.
+    oc process -f https://raw.githubusercontent.com/ninech/actuator-demo/master/template.yml -p BRANCH_NAME=master | oc create -f -
 
 Or by using the provided template.

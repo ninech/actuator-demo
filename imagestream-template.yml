@@ -15,22 +15,4 @@ objects:
   spec:
     lookupPolicy:
       local: false
-    tags:
-    - annotations: null
-      from:
-        kind: DockerImage
-        name: 172.30.210.183:5000/ninech-actuator/actuator-demo:latest
-      generation: 2
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: Source
-    - annotations: null
-      from:
-        kind: DockerImage
-        name: 172.30.210.183:5000/ninech-actuator/actuator-demo:master
-      generation: null
-      importPolicy: {}
-      name: master
-      referencePolicy:
-        type: ""
+    tags: []
