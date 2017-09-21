@@ -12,6 +12,7 @@ objects:
   metadata:
     labels:
       app: actuator-demo-${BRANCH_NAME}
+      branch: ${BRANCH_NAME}
     name: actuator-demo-${BRANCH_NAME}
   spec:
     nodeSelector: null
@@ -43,6 +44,7 @@ objects:
     generation: 1
     labels:
       app: actuator-demo-${BRANCH_NAME}
+      branch: ${BRANCH_NAME}
     name: actuator-demo-${BRANCH_NAME}
   spec:
     replicas: 1
@@ -63,6 +65,7 @@ objects:
       metadata:
         labels:
           app: actuator-demo-${BRANCH_NAME}
+          branch: ${BRANCH_NAME}
           deploymentconfig: actuator-demo-${BRANCH_NAME}
       spec:
         containers:
@@ -97,6 +100,7 @@ objects:
     name: actuator-demo-${BRANCH_NAME}
     labels:
       app: actuator-demo-${BRANCH_NAME}
+      branch: ${BRANCH_NAME}
   spec:
     host: ${BRANCH_NAME}.actuator-demo.openshift-apps.staging.nine.ch
     port:
@@ -111,6 +115,7 @@ objects:
   metadata:
     labels:
       app: actuator-demo-${BRANCH_NAME}
+      branch: ${BRANCH_NAME}
     name: actuator-demo-${BRANCH_NAME}
   spec:
     ports:
