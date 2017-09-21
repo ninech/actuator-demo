@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: actuator-demo
+parameters:
+- name: BRANCH_NAME
+  description: The git branch to deploy
+  required: true
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: actuator-demo-${BRANCH_NAME}
+    name: actuator-demo-${BRANCH_NAME}
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: actuator-demo:${BRANCH_NAME}
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        uri: https://github.com/ninech/actuator-demo.git
+        ref: ${BRANCH_NAME}
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: DockerImage
+          name: centos/nginx-18-centos7:latest
+      type: Source
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    generation: 1
+    labels:
+      app: actuator-demo-${BRANCH_NAME}
+    name: actuator-demo-${BRANCH_NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: actuator-demo-${BRANCH_NAME}
+      deploymentconfig: actuator-demo-${BRANCH_NAME}
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: actuator-demo-${BRANCH_NAME}
+          deploymentconfig: actuator-demo-${BRANCH_NAME}
+      spec:
+        containers:
+        - image: 172.30.210.183:5000/ninech-actuator/actuator-demo
+          imagePullPolicy: Always
+          name: actuator-demo
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - actuator-demo
+        from:
+          kind: ImageStreamTag
+          name: actuator-demo:${BRANCH_NAME}
+      type: ImageChange
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: actuator-demo-${BRANCH_NAME}
+    labels:
+      app: actuator-demo-${BRANCH_NAME}
+  spec:
+    host: ${BRANCH_NAME}.actuator-demo.openshift-apps.staging.nine.ch
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: actuator-demo-${BRANCH_NAME}
+      weight: 100
+    wildcardPolicy: None
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: actuator-demo-${BRANCH_NAME}
+    name: actuator-demo-${BRANCH_NAME}
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: actuator-demo-${BRANCH_NAME}
+      deploymentconfig: actuator-demo-${BRANCH_NAME}
+    sessionAffinity: None
+    type: ClusterIP
